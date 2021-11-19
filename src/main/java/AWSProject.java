@@ -2,10 +2,7 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
-import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
-import com.amazonaws.services.ec2.model.DescribeInstancesResult;
-import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.Reservation;
+import com.amazonaws.services.ec2.model.*;
 
 import java.util.Scanner;
 
@@ -64,6 +61,37 @@ public class AWSProject {
                 case 1:
                     listInstances();
                     break;
+
+                case 2:
+                    availableZones();
+                    break;
+
+                case 3:
+                    startInstances();
+                    break;
+
+                case 4:
+                    availableRegions();
+                    break;
+
+                case 5:
+                    stopInstances();
+                    break;
+
+                case 6:
+                    createInstances();
+                    break;
+
+                case 7:
+                    rebootInstances();
+                    break;
+
+                case 8:
+                    listImages();
+                    break;
+
+                case 99:
+                    return;
             }
         }
     }
@@ -100,5 +128,69 @@ public class AWSProject {
                 done = true;
             }
         }
+    }
+
+    public static void availableZones() {
+        DescribeAvailabilityZonesResult zonesResult = ec2.describeAvailabilityZones();
+        int zoneSize = 0;
+
+        System.out.println("Available zones....");
+        for (AvailabilityZone zone : zonesResult.getAvailabilityZones()) {
+            System.out.printf(
+                    "[id] %s " +
+                    "[region] %s " +
+                    "[zone] %s\n",
+                    zone.getZoneId(),
+                    zone.getRegionName(),
+                    zone.getZoneName());
+
+            zoneSize++;
+        }
+        System.out.printf("You have access to %d Availability Zones.\n", zoneSize);
+    }
+
+    public static void startInstances() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("id : ");
+        String instance_id = scanner.nextLine();
+
+        StartInstancesRequest request = new StartInstancesRequest().withInstanceIds(instance_id);
+
+        ec2.startInstances(request);
+    }
+
+    public static void availableRegions() {
+        DescribeRegionsResult regionsResult = ec2.describeRegions();
+
+        for(Region region : regionsResult.getRegions()) {
+            System.out.printf(
+                    "[id] %s " +
+                    "[endpoint] %s\n",
+                    region.getRegionName(),
+                    region.getEndpoint());
+
+        }
+    }
+
+    public static void stopInstances() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("id : ");
+        String instance_id = scanner.nextLine();
+
+        StopInstancesRequest request = new StopInstancesRequest().withInstanceIds(instance_id);
+
+        ec2.stopInstances(request);
+    }
+
+    public static void createInstances() {
+
+    }
+
+    public static void rebootInstances() {
+
+    }
+
+    public static void listImages() {
+
     }
 }
