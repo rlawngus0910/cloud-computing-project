@@ -183,14 +183,48 @@ public class AWSProject {
     }
 
     public static void createInstances() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter ami id : ");
+        String ami_id = scanner.nextLine();
 
+        RunInstancesRequest runRequest = new RunInstancesRequest()
+                .withImageId(ami_id)
+                .withInstanceType(InstanceType.T1Micro)
+                .withMaxCount(1)
+                .withMinCount(1);
+
+        RunInstancesResult runResponse = ec2.runInstances(runRequest);
+        String reservation_id = runResponse.getReservation().getInstances().get(0).getInstanceId();
+
+        System.out.printf("Successfully started EC2 instance %s based on %s\n", reservation_id, ami_id);
     }
 
     public static void rebootInstances() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter instance id : ");
+        String instance_id = scanner.nextLine();
 
+        RebootInstancesRequest request = new RebootInstancesRequest().withInstanceIds(instance_id);
+        RebootInstancesResult response = ec2.rebootInstances(request);
+
+        System.out.printf("Successfully rebooted instance %s\n", instance_id);
     }
 
     public static void listImages() {
+        DescribeImagesResult imagesResult = ec2.describeImages();
+
+        for(Image image : imagesResult.getImages()) {
+            System.out.printf(
+                    "[id] %s " +
+                            "[region] %s " +
+                            "[zone] %s\n",
+                    image.getImageId(),
+                    image.getName(),
+                    image.getOwnerId());
+        }
+
+
+
 
     }
 }
