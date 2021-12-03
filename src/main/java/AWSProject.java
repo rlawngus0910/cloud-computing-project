@@ -211,20 +211,19 @@ public class AWSProject {
     }
 
     public static void listImages() {
-        DescribeImagesResult imagesResult = ec2.describeImages();
+        DescribeImagesRequest request = new DescribeImagesRequest().withOwners("self");
+        System.out.println("Listing images....");
 
-        for(Image image : imagesResult.getImages()) {
+        DescribeImagesResult response = ec2.describeImages(request);
+
+        for(Image image : response.getImages()) {
             System.out.printf(
                     "[id] %s " +
-                            "[region] %s " +
-                            "[zone] %s\n",
+                    "[region] %s " +
+                    "[zone] %s\n",
                     image.getImageId(),
                     image.getName(),
                     image.getOwnerId());
         }
-
-
-
-
     }
 }
