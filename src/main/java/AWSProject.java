@@ -218,9 +218,9 @@ public class AWSProject {
 
         for(Image image : response.getImages()) {
             System.out.printf(
-                    "[id] %s " +
-                    "[region] %s " +
-                    "[zone] %s\n",
+                    "[ImageID] %s " +
+                    "[Name] %s " +
+                    "[Owner] %s\n",
                     image.getImageId(),
                     image.getName(),
                     image.getOwnerId());
