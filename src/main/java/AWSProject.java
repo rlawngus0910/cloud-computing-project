@@ -49,7 +49,8 @@ public class AWSProject {
             System.out.println("  3. start instance               4. available regions      ");
             System.out.println("  5. stop instance                6. create instance        ");
             System.out.println("  7. reboot instance              8. list images            ");
-            System.out.println("                                 99. quit                   ");
+            System.out.println("  9. terminate instance          10. create images          ");
+            System.out.println(" 11. delete images               99. quit                   ");
             System.out.println("------------------------------------------------------------");
 
             System.out.print("Enter an integer: ");
@@ -87,6 +88,18 @@ public class AWSProject {
 
                 case 8:
                     listImages();
+                    break;
+
+                case 9:
+                    terminateInstances();
+                    break;
+
+                case 10:
+                    createImages();
+                    break;
+
+                case 11:
+                    deleteImages();
                     break;
 
                 case 99:
@@ -157,6 +170,8 @@ public class AWSProject {
         try {
             StartInstancesRequest request = new StartInstancesRequest().withInstanceIds(instance_id);
             ec2.startInstances(request);
+
+            System.out.printf("Successfully started instance %s\n", instance_id);
         } catch (Exception e) {
             System.out.println("Can't find this instance.");
         }
@@ -182,6 +197,8 @@ public class AWSProject {
         try {
             StopInstancesRequest request = new StopInstancesRequest().withInstanceIds(instance_id);
             ec2.stopInstances(request);
+
+            System.out.printf("Successfully stopped instance %s\n", instance_id);
         } catch (Exception e) {
             System.out.println("Can't find this instance.");
         }
@@ -238,6 +255,55 @@ public class AWSProject {
                     image.getImageId(),
                     image.getName(),
                     image.getOwnerId());
+        }
+    }
+
+    public static void terminateInstances() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter instance id : ");
+        String instance_id = scanner.nextLine();
+
+        try {
+            TerminateInstancesRequest request = new TerminateInstancesRequest().withInstanceIds(instance_id);
+            ec2.terminateInstances(request);
+
+            System.out.printf("Successfully terminated instance %s\n", instance_id);
+
+        } catch (Exception e) {
+            System.out.println("Can't find this instance.");
+        }
+    }
+
+    public static void createImages() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter instance id : ");
+        String instance_id = scanner.nextLine();
+        System.out.print("Enter image name : ");
+        String img_name = scanner.nextLine();
+
+        try {
+            CreateImageRequest request = new CreateImageRequest().withInstanceId(instance_id).withName(img_name);
+            CreateImageResult response = ec2.createImage(request);
+
+            String ami_id = response.getImageId();
+            System.out.printf("Successfully started image %s based on %s\n", ami_id, instance_id);
+        } catch (Exception e) {
+            System.out.println("Can't create image.");
+        }
+    }
+
+    public static void deleteImages() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter image id : ");
+        String ami_id = scanner.nextLine();
+
+        try {
+            DeregisterImageRequest request = new DeregisterImageRequest().withImageId(ami_id);
+            ec2.deregisterImage(request);
+
+            System.out.printf("Successfully deleted image %s\n", ami_id);
+        } catch (Exception e) {
+            System.out.println("Can't create image.");
         }
     }
 }
