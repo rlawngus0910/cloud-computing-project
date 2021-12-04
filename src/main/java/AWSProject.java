@@ -34,7 +34,6 @@ public class AWSProject {
         init();
 
         Scanner menu = new Scanner(System.in);
-        Scanner id_string = new Scanner(System.in);
         int number = 0;
 
         while(true) {
@@ -91,6 +90,7 @@ public class AWSProject {
                     break;
 
                 case 99:
+                    System.out.println("Exit the program. Bye.");
                     return;
             }
         }
@@ -151,12 +151,15 @@ public class AWSProject {
 
     public static void startInstances() {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("id : ");
+        System.out.print("Enter instance id : ");
         String instance_id = scanner.nextLine();
 
-        StartInstancesRequest request = new StartInstancesRequest().withInstanceIds(instance_id);
-
-        ec2.startInstances(request);
+        try {
+            StartInstancesRequest request = new StartInstancesRequest().withInstanceIds(instance_id);
+            ec2.startInstances(request);
+        } catch (Exception e) {
+            System.out.println("Can't find this instance.");
+        }
     }
 
     public static void availableRegions() {
@@ -168,18 +171,20 @@ public class AWSProject {
                     "[endpoint] %s\n",
                     region.getRegionName(),
                     region.getEndpoint());
-
         }
     }
 
     public static void stopInstances() {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("id : ");
+        System.out.print("Enter instance id : ");
         String instance_id = scanner.nextLine();
 
-        StopInstancesRequest request = new StopInstancesRequest().withInstanceIds(instance_id);
-
-        ec2.stopInstances(request);
+        try {
+            StopInstancesRequest request = new StopInstancesRequest().withInstanceIds(instance_id);
+            ec2.stopInstances(request);
+        } catch (Exception e) {
+            System.out.println("Can't find this instance.");
+        }
     }
 
     public static void createInstances() {
@@ -187,16 +192,20 @@ public class AWSProject {
         System.out.print("Enter ami id : ");
         String ami_id = scanner.nextLine();
 
-        RunInstancesRequest runRequest = new RunInstancesRequest()
-                .withImageId(ami_id)
-                .withInstanceType(InstanceType.T1Micro)
-                .withMaxCount(1)
-                .withMinCount(1);
+        try {
+            RunInstancesRequest runRequest = new RunInstancesRequest()
+                    .withImageId(ami_id)
+                    .withInstanceType(InstanceType.T2Micro)
+                    .withMaxCount(1)
+                    .withMinCount(1);
 
-        RunInstancesResult runResponse = ec2.runInstances(runRequest);
-        String reservation_id = runResponse.getReservation().getInstances().get(0).getInstanceId();
+            RunInstancesResult runResponse = ec2.runInstances(runRequest);
+            String reservation_id = runResponse.getReservation().getInstances().get(0).getInstanceId();
 
-        System.out.printf("Successfully started EC2 instance %s based on %s\n", reservation_id, ami_id);
+            System.out.printf("Successfully started EC2 instance %s based on %s\n", reservation_id, ami_id);
+        } catch (Exception e) {
+            System.out.println("Can't find this image.");
+        }
     }
 
     public static void rebootInstances() {
@@ -204,10 +213,15 @@ public class AWSProject {
         System.out.print("Enter instance id : ");
         String instance_id = scanner.nextLine();
 
-        RebootInstancesRequest request = new RebootInstancesRequest().withInstanceIds(instance_id);
-        RebootInstancesResult response = ec2.rebootInstances(request);
+        try {
+            RebootInstancesRequest request = new RebootInstancesRequest().withInstanceIds(instance_id);
+            ec2.rebootInstances(request);
 
-        System.out.printf("Successfully rebooted instance %s\n", instance_id);
+            System.out.printf("Successfully rebooted instance %s\n", instance_id);
+
+        } catch (Exception e) {
+            System.out.println("Can't find this instance.");
+        }
     }
 
     public static void listImages() {
